@@ -1,0 +1,6 @@
+Reimplementation in Ruby of `t` (https://github.com/sjl/t)
+
+I thought `t` was neat. I thought it would be fun to do this. It was.
+
+(Still broken in place atm.)
+(Might add more features for fun.)
