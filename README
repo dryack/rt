@@ -4,3 +4,5 @@ I thought `t` was neat. I thought it would be fun to do this. It was.
 
 (Still broken in places atm.)
 (Might add more features for fun.)
+
+Change shebang to point to your ruby.  Requires ruby >= 2.6.3.
