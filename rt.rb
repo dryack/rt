@@ -1,4 +1,5 @@
-# rt.tb - a reimplementation in Ruby of t.py (https://github.com/sjl/t)
+#!/home/w80/.rvm/rubies/ruby-2.6.3/bin/ruby
+## rt.tb - a reimplementation in Ruby of t.py (https://github.com/sjl/t)
 
 #MIT License
 #
@@ -107,22 +108,22 @@ class TaskDict
 
       raise InvalidTaskfile if File.directory?(path)
 
-      raise BadFile, path unless File.exist?(path)
-
-      File.open(path.to_s, 'r') do |tfile|
-        tls = IO.readlines(tfile, strip: true) do |line|
-          tls << line
-        end
-        tls.map do |x|
-          y = task_from_taskline(x)
-          y.each_key do |task|
-            if task.empty?
-              next
-            else
-              if kind.to_s === 'tasks'
-                @tasks[y[:id]] = y
+      if File.exist?(path)
+        File.open(path.to_s, 'r') do |tfile|
+          tls = IO.readlines(tfile, strip: true) do |line|
+            tls << line
+          end
+          tls.map do |x|
+            y = task_from_taskline(x)
+            y.each_key do |task|
+              if task.empty?
+                next
               else
-                @done[y[:id]] = y if kind.to_s === 'done'
+                if kind.to_s === 'tasks'
+                  @tasks[y[:id]] = y
+                else
+                  @done[y[:id]] = y if kind.to_s === 'done'
+                end
               end
             end
           end
@@ -186,7 +187,11 @@ class TaskDict
 
   def remove_task(prefix)
     task = _get_item(prefix)
-    @tasks.delete(task[:id])
+		if task[:done]
+      @done.delete(task[:id])
+    else
+      @tasks.delete(task[:id])
+    end
   end
 
   def print_list(kind: 'tasks', verbose: false, quiet: false, grep: '')
@@ -204,7 +209,7 @@ class TaskDict
     # FIXME this bit is terrible, but i'm feeling impatient currently - and it works
     plen = []
     tasks.each_value { |x| plen << x.fetch(label.to_sym) }
-    plen = plen.max_by(&:length).length.to_i
+    plen = plen.max_by(&:length).length.to_i unless plen.empty?
     grep = '' if grep.nil?
     tasks.each_pair do |k, v|
       if v[:text].downcase.include?(grep.downcase)
@@ -232,12 +237,10 @@ class TaskDict
   def write(delete_if_empty = false)
     tasks = @tasks.reject { |_, v| v[:done] }
     done = @done
-
     filemap = { tasks: @name, done: ".#{@name}.done" }
     filemap.each_pair do |kind, filename|
       path = File.join(File.expand_path(@taskdir), filename)
       raise InvalidTaskfile if File.directory?(path)
-      raise BadFile, path unless File.exist?(path)
 
       if kind === :tasks
         File.open(path.to_s, 'w') do |tfile|
@@ -320,5 +323,5 @@ rescue AmbiguousPrefix => e
 rescue UnknownPrefix => e
   puts "No tasks IDs match '#{e.message}.'"
 rescue BadFile => e
-  puts "File not found: #{e.message}"
+  #puts "File not found: #{e.message}"
 end
