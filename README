@@ -5,4 +5,9 @@ I thought `t` was neat. I thought it would be fun to do this. It was.
 (Still broken in places atm.)
 (Might add more features for fun.)
 
-Change shebang to point to your ruby.  Requires ruby >= 2.6.3.
+Installation:
+Change shebang to point to your ruby.
+Run bundle or manually install 'slop' and 'pp'
+Consider creating an alias along the lines of `alias t='~/projects/rt/rt.rb --task-dir ~'`
+
+Requires ruby >= 2.6.3.
